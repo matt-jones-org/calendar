@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Book a time | Matt Jones</title>
+<style>
+  :root {
+    --paper:   #F2F4EC;
+    --card:    #FBFCF7;
+    --ink:     #171A12;
+    --muted:   #5B6152;
+    --line:    #C9CFBE;
+    --stitch:  #CC3B2E;
+    --grass:   #2F6B45;
+    --shadow:  0 1px 0 rgba(23,26,18,.04), 0 12px 30px -18px rgba(23,26,18,.35);
+    --maxw: 1080px;
+    --f-display: "Helvetica Neue", "Arial Narrow", Arial, sans-serif;
+    --f-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --f-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:  #0D1310;
+      --card:   #141B14;
+      --ink:    #EDEFE6;
+      --muted:  #9AA394;
+      --line:   #2A3326;
+      --stitch: #E4573F;
+      --grass:  #4E9E6A;
+      --shadow: 0 1px 0 rgba(0,0,0,.3), 0 18px 40px -22px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="light"] {
+    --paper:#F2F4EC; --card:#FBFCF7; --ink:#171A12; --muted:#5B6152;
+    --line:#C9CFBE; --stitch:#CC3B2E; --grass:#2F6B45;
+    --shadow:0 1px 0 rgba(23,26,18,.04), 0 12px 30px -18px rgba(23,26,18,.35);
+  }
+  :root[data-theme="dark"] {
+    --paper:#0D1310; --card:#141B14; --ink:#EDEFE6; --muted:#9AA394;
+    --line:#2A3326; --stitch:#E4573F; --grass:#4E9E6A;
+    --shadow:0 1px 0 rgba(0,0,0,.3), 0 18px 40px -22px rgba(0,0,0,.8);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--f-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  a { color: inherit; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--stitch);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .mono { font-family: var(--f-mono); }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  /* ---- Stitch: the signature detail (baseball lacing) ---- */
+  .stitch {
+    height: 0;
+    border-top: 2px dashed var(--stitch);
+    opacity: .8;
+  }
+
+  /* ---- Top bar ---- */
+  header.bar {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: saturate(1.1) blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar .wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .wordmark {
+    font-family: var(--f-display);
+    font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+    font-size: .95rem; text-decoration: none;
+    display: inline-flex; align-items: center; gap: .5em;
+  }
+  .wordmark .ball {
+    width: 15px; height: 15px; border-radius: 50%;
+    background: var(--card);
+    border: 1.5px solid var(--stitch);
+    position: relative; display: inline-block;
+  }
+  .wordmark .ball::before, .wordmark .ball::after {
+    content:""; position:absolute; inset:2px 4px;
+    border:1px solid var(--stitch); border-top:0; border-bottom:0;
+    border-radius: 50%;
+  }
+  nav.top { display: flex; gap: 22px; }
+  nav.top a {
+    font-family: var(--f-mono); font-size: .72rem; letter-spacing: .12em;
+    text-transform: uppercase; text-decoration: none; color: var(--muted);
+    padding: 6px 0; border-bottom: 2px solid transparent; transition: color .15s, border-color .15s;
+  }
+  nav.top a:hover { color: var(--ink); border-color: var(--stitch); }
+  @media (max-width: 620px){ nav.top { display: none; } }
+
+  /* ---- Nav dropdowns (Software / Baseball) ---- */
+  nav.top .menu { position: relative; display: flex; align-items: center; }
+  nav.top .menu > a .caret { font-size: .85em; color: var(--stitch); }
+  nav.top .menu-list {
+    position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    min-width: 200px; padding: 6px 0;
+    background: var(--card); border: 1px solid var(--line);
+    border-top: 2px dashed var(--stitch); border-radius: 0 0 6px 6px;
+    box-shadow: var(--shadow);
+    display: none; flex-direction: column;
+  }
+  nav.top .menu:hover .menu-list,
+  nav.top .menu:focus-within .menu-list { display: flex; }
+  nav.top .menu-list a {
+    display: block; padding: 10px 16px; border-bottom: 0;
+    white-space: nowrap;
+  }
+  nav.top .menu-list a:hover {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--grass) 9%, transparent);
+  }
+
+  /* ---- Hero ---- */
+  .hero { padding: clamp(52px, 9vw, 104px) 0 clamp(40px,6vw,64px); }
+  .eyebrow {
+    font-family: var(--f-mono); font-size: .74rem; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--grass); margin: 0 0 18px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .eyebrow::after { content:""; flex:1; height:1px; background: var(--line); }
+  h1.name {
+    font-family: var(--f-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: .9;
+    margin: 0;
+    font-size: clamp(3.4rem, 15vw, 9.2rem);
+    text-wrap: balance;
+  }
+  .tagline {
+    margin: 18px 0 0;
+    font-family: var(--f-display);
+    font-weight: 700; font-style: italic;
+    font-size: clamp(1.25rem, 3.2vw, 2rem);
+    color: var(--stitch);
+    letter-spacing: -.01em;
+  }
+  .lede {
+    max-width: 46ch; margin: 22px 0 0; font-size: 1.075rem; color: var(--muted);
+  }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+  .btn {
+    font-family: var(--f-mono); font-size: .78rem; letter-spacing: .08em;
+    text-transform: uppercase; text-decoration: none;
+    padding: 12px 18px; border-radius: 2px; border: 1.5px solid var(--ink);
+    display: inline-flex; align-items: center; gap: .55em;
+    transition: transform .12s ease, background .15s, color .15s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.primary { background: var(--stitch); border-color: var(--stitch); color: #fff; }
+  .btn.primary:hover { background: color-mix(in srgb, var(--stitch) 88%, #000); }
+  .btn.ghost:hover { background: var(--ink); color: var(--paper); }
+
+  /* ---- Section shell ---- */
+  section { padding: clamp(46px, 7vw, 82px) 0; }
+  .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px; }
+  .sec-kicker {
+    font-family: var(--f-mono); font-size: .72rem; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  h2.sec-title {
+    font-family: var(--f-display); font-weight: 800; text-transform: uppercase;
+    letter-spacing: -.01em; line-height: 1; margin: 6px 0 0;
+    font-size: clamp(1.9rem, 5vw, 3.1rem); text-wrap: balance;
+  }
+  .sec-sub { color: var(--muted); margin: 14px 0 0; max-width: 54ch; }
+
+  /* ---- Lineup card (scorecard) ---- */
+  .card {
+    margin-top: 30px; background: var(--card);
+    border: 1px solid var(--line); border-radius: 6px;
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  .card-top {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 20px; border-bottom: 2px dashed var(--stitch);
+    font-family: var(--f-mono); font-size: .72rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  ul.lineup { list-style: none; margin: 0; padding: 4px 0; }
+  ul.lineup li a {
+    display: grid;
+    grid-template-columns: 46px 1fr auto 28px;
+    align-items: center; gap: 16px;
+    padding: 15px 20px; text-decoration: none;
+    border-bottom: 1px solid var(--line);
+    transition: background .14s;
+  }
+  ul.lineup li:last-child a { border-bottom: 0; }
+  ul.lineup li a:hover { background: color-mix(in srgb, var(--grass) 9%, transparent); }
+  .pos {
+    font-family: var(--f-mono); font-weight: 700; font-size: 1.05rem;
+    color: var(--stitch); text-align: center;
+  }
+  .player { font-family: var(--f-display); font-weight: 700; text-transform: uppercase;
+    letter-spacing: .01em; font-size: 1.16rem; }
+  .side {
+    font-family: var(--f-mono); font-size: .66rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; white-space: nowrap;
+  }
+  .arrow { color: var(--muted); text-align: center; transition: transform .14s, color .14s; }
+  ul.lineup li a:hover .arrow { color: var(--stitch); transform: translateX(3px); }
+  @media (max-width: 560px){
+    ul.lineup li a { grid-template-columns: 34px 1fr 26px; }
+    .side { display: none; }
+  }
+
+  /* ---- Snapshots ---- */
+  .snaps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+  @media (max-width: 760px){ .snaps { grid-template-columns: 1fr; } }
+  .snap {
+    background: var(--card); border: 1px solid var(--line); border-radius: 6px;
+    padding: 22px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 10px; text-decoration: none;
+    transition: transform .12s, border-color .15s;
+  }
+  .snap:hover { transform: translateY(-3px); border-color: var(--stitch); }
+  .snap .tag { font-family: var(--f-mono); font-size: .68rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--grass); }
+  .snap h3 { margin: 2px 0 0; font-family: var(--f-display); font-weight: 700;
+    text-transform: uppercase; font-size: 1.15rem; letter-spacing: -.005em; }
+  .snap p { margin: 0; color: var(--muted); font-size: .95rem; }
+  .snap .more { margin-top: auto; font-family: var(--f-mono); font-size: .72rem;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--stitch); }
+
+  /* ---- Footer ---- */
+  footer {
+    border-top: 2px dashed var(--stitch);
+    padding: 48px 0 60px; margin-top: 20px;
+  }
+  .foot-grid { display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; flex-wrap: wrap; }
+  .foot-name { font-family: var(--f-display); font-weight: 800; text-transform: uppercase;
+    font-size: clamp(1.6rem, 5vw, 2.4rem); letter-spacing: -.01em; line-height: 1; }
+  .foot-links { display: flex; flex-direction: column; gap: 8px; }
+  .foot-links a { font-family: var(--f-mono); font-size: .82rem; letter-spacing: .04em;
+    color: var(--muted); text-decoration: none; }
+  .foot-links a:hover { color: var(--stitch); }
+  .copyright { margin-top: 26px; font-family: var(--f-mono); font-size: .72rem;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+  /* ---- Reveal motion ---- */
+  .reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .btn:hover, .snap:hover, ul.lineup li a:hover .arrow { transform: none; }
+  }
+
+  /* ---- Subpage adjustments ---- */
+  .hero h1.name { font-size: clamp(2.6rem, 10vw, 6.5rem); }
+
+  /* ---- Interactive calendar ---- */
+  .cal-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 16px; border-bottom: 2px dashed var(--stitch);
+  }
+  .cal-nav { display: flex; gap: 8px; }
+  .cal-nav button {
+    font-family: var(--f-mono); font-size: 1rem; line-height: 1;
+    background: transparent; border: 1px solid var(--line); border-radius: 4px;
+    padding: 8px 14px; color: var(--ink); cursor: pointer;
+    transition: color .12s, border-color .12s;
+  }
+  .cal-nav button:hover:not(:disabled) { border-color: var(--stitch); color: var(--stitch); }
+  .cal-nav button:disabled { opacity: .35; cursor: default; }
+  .cal-label {
+    font-family: var(--f-mono); font-size: .8rem; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--ink); font-weight: 700;
+  }
+  .cal-state {
+    font-family: var(--f-mono); font-size: .7rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  @media (max-width: 560px){ .cal-state { display: none; } }
+  table.cal-grid { width: 100%; border-collapse: collapse; }
+  .cal-grid th {
+    font-family: var(--f-mono); font-size: .64rem; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--muted); font-weight: 400;
+    padding: 12px 0 10px; border-bottom: 1px solid var(--line);
+  }
+  .cal-grid td { border: 1px solid var(--line); padding: 0; height: 54px; width: 14.28%; }
+  .cal-grid td.blank { background: color-mix(in srgb, var(--line) 16%, transparent); }
+  button.day {
+    display: block; width: 100%; height: 100%;
+    background: transparent; border: 0; cursor: pointer;
+    font-family: var(--f-mono); font-variant-numeric: tabular-nums;
+    font-size: .92rem; color: var(--ink); transition: background .12s;
+  }
+  button.day:hover:not(:disabled) { background: color-mix(in srgb, var(--grass) 12%, transparent); }
+  button.day:disabled { color: color-mix(in srgb, var(--muted) 40%, transparent); cursor: default; }
+  button.day[aria-pressed="true"] { background: var(--grass); color: #fff; font-weight: 700; }
+  button.day.today:not([aria-pressed="true"])::after {
+    content: ""; display: block; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--stitch); margin: 3px auto 0;
+  }
+  .win-row {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 16px 20px; border-top: 1px solid var(--line);
+  }
+  .win-label {
+    font-family: var(--f-mono); font-size: .68rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--muted); margin-right: 4px;
+  }
+  .chip {
+    font-family: var(--f-mono); font-size: .74rem; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--ink);
+    background: transparent; border: 1px solid var(--line); border-radius: 999px;
+    padding: 9px 16px; cursor: pointer;
+    transition: background .14s, border-color .14s, color .14s;
+  }
+  .chip:hover { border-color: var(--grass); }
+  .chip[aria-pressed="true"] { background: var(--grass); border-color: var(--grass); color: #fff; }
+  .book-row {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 20px; border-top: 2px dashed var(--stitch);
+  }
+  .book-hint {
+    font-family: var(--f-mono); font-size: .72rem; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="wordmark" href="https://www.matt-jones.org/"><span class="ball" aria-hidden="true"></span> Matt Jones</a>
+    <nav class="top" aria-label="Primary">
+      <a href="https://www.matt-jones.org/">Home</a>
+      <a href="https://www.matt-jones.org/about">About</a>
+      <a href="https://www.matt-jones.org/portfolio">Portfolio</a>
+      <div class="menu">
+        <a href="https://www.matt-jones.org/portfolio#software" aria-haspopup="true">Software <span class="caret" aria-hidden="true">▾</span></a>
+        <div class="menu-list">
+          <a href="https://www.matt-jones.org/portfolio#llmadness">LLMAdness</a>
+          <a href="https://www.matt-jones.org/portfolio#cry-wolf">Cry Wolf</a>
+          <a href="https://www.matt-jones.org/portfolio#the-bullzen">The Bullzen</a>
+          <a href="https://www.matt-jones.org/portfolio#windhover">Windhover</a>
+        </div>
+      </div>
+      <div class="menu">
+        <a href="https://www.matt-jones.org/portfolio#baseball" aria-haspopup="true">Baseball <span class="caret" aria-hidden="true">▾</span></a>
+        <div class="menu-list">
+          <a href="https://www.matt-jones.org/magic-number">Magic Number</a>
+          <a href="https://www.matt-jones.org/portfolio#black-ink">Black Ink</a>
+          <a href="https://www.matt-jones.org/portfolio#scouting-report">Scouting Report</a>
+        </div>
+      </div>
+      <a href="https://www.matt-jones.org/calendar">Book a time</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow reveal">First pitch &nbsp;·&nbsp; your call</p>
+      <h1 class="name reveal">Book a Time</h1>
+      <p class="tagline reveal">Nine innings or a quick catch — your pick.</p>
+      <p class="lede reveal">Pick a day on the calendar, choose a window, and the email writes itself — date, time, and room to say what you want to talk about. All times Central.</p>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="stitch" aria-hidden="true"></div></div>
+
+  <section id="schedule">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="sec-kicker">The schedule</span></div>
+      <h2 class="sec-title reveal">Pick Your Day</h2>
+      <p class="sec-sub reveal">Weekdays only — the weekend is for baseball. Green means you're on the card.</p>
+      <div class="card reveal">
+        <div class="cal-head">
+          <div class="cal-nav">
+            <button type="button" id="cal-prev" aria-label="Previous month">‹</button>
+            <button type="button" id="cal-next" aria-label="Next month">›</button>
+          </div>
+          <span class="cal-label" id="cal-label">—</span>
+          <span class="cal-state mono" id="cal-state">No day picked</span>
+        </div>
+        <table class="cal-grid tnum" aria-label="Calendar — pick a weekday">
+          <thead>
+            <tr><th scope="col">Sun</th><th scope="col">Mon</th><th scope="col">Tue</th><th scope="col">Wed</th><th scope="col">Thu</th><th scope="col">Fri</th><th scope="col">Sat</th></tr>
+          </thead>
+          <tbody id="cal-body"></tbody>
+        </table>
+        <div class="win-row" role="group" aria-label="Choose a window">
+          <span class="win-label">Window</span>
+          <button class="chip" type="button" data-win="Morning" aria-pressed="false">Morning · 9a–12p</button>
+          <button class="chip" type="button" data-win="Afternoon" aria-pressed="false">Afternoon · 12p–5p</button>
+          <button class="chip" type="button" data-win="Evening" aria-pressed="false">Evening · 5p–8p</button>
+        </div>
+        <div class="book-row">
+          <a class="btn primary" id="book-btn" href="mailto:mscottjones24@gmail.com?subject=Book%20a%20time">Email to book <span aria-hidden="true">→</span></a>
+          <span class="book-hint" id="book-hint">Pick a day and a window — or email cold, that works too.</span>
+        </div>
+      </div>
+
+      <div class="snaps" style="margin-top:26px;">
+        <div class="snap reveal">
+          <span class="tag">The format</span>
+          <h3>Thirty minutes</h3>
+          <p>Enough for a real conversation, short enough to respect your day. Need longer? Say so in the email.</p>
+        </div>
+        <div class="snap reveal">
+          <span class="tag">The venue</span>
+          <h3>Call or coffee</h3>
+          <p>Video call by default. In Austin from October 2026? Coffee works — winner buys.</p>
+        </div>
+        <a class="snap reveal" href="mailto:mscottjones24@gmail.com">
+          <span class="tag">The backup</span>
+          <h3>Just email</h3>
+          <p>Calendars optional. A plain note to the inbox gets the same answer.</p>
+          <span class="more">mscottjones24@gmail.com →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="stitch" aria-hidden="true" style="margin-bottom:34px;"></div>
+    <div class="foot-grid">
+      <div>
+        <div class="foot-name">Let's talk ball.</div>
+        <p class="sec-sub" style="margin-top:12px;">Interested in what I'm building here? Drop a line — I answer.</p>
+      </div>
+      <div class="foot-links">
+        <a href="mailto:mscottjones24@gmail.com">mscottjones24@gmail.com</a>
+        <a href="https://linkedin.com/in/mattjoneshtx">linkedin.com/in/mattjoneshtx</a>
+        <a href="https://www.matt-jones.org/calendar">Book a time →</a>
+      </div>
+    </div>
+    <div class="copyright">© Matt Jones, 2026 — A website about nothing.</div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      els.forEach(function (e) { e.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12 });
+    els.forEach(function (e) { io.observe(e); });
+  })();
+</script>
+
+<script>
+  (function () {
+    var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    var MAIL = 'mscottjones24@gmail.com';
+
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var view = new Date(today.getFullYear(), today.getMonth(), 1);
+    var minView = new Date(view);
+    var maxView = new Date(today.getFullYear(), today.getMonth() + 2, 1);
+    var selDate = null, selWin = null;
+
+    var body = document.getElementById('cal-body');
+    var label = document.getElementById('cal-label');
+    var state = document.getElementById('cal-state');
+    var prev = document.getElementById('cal-prev');
+    var next = document.getElementById('cal-next');
+    var btn = document.getElementById('book-btn');
+    var hint = document.getElementById('book-hint');
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+
+    function render() {
+      label.textContent = MONTHS[view.getMonth()] + ' ' + view.getFullYear();
+      prev.disabled = view <= minView;
+      next.disabled = view >= maxView;
+      body.innerHTML = '';
+      var first = new Date(view.getFullYear(), view.getMonth(), 1).getDay();
+      var count = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+      var row = document.createElement('tr');
+      for (var i = 0; i < first; i++) row.appendChild(blank());
+      for (var d = 1; d <= count; d++) {
+        var date = new Date(view.getFullYear(), view.getMonth(), d);
+        var td = document.createElement('td');
+        td.appendChild(dayButton(date));
+        row.appendChild(td);
+        if (date.getDay() === 6) { body.appendChild(row); row = document.createElement('tr'); }
+      }
+      while (row.children.length && row.children.length < 7) row.appendChild(blank());
+      if (row.children.length) body.appendChild(row);
+    }
+
+    function blank() {
+      var td = document.createElement('td');
+      td.className = 'blank';
+      return td;
+    }
+
+    function dayButton(date) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'day';
+      b.textContent = date.getDate();
+      var dow = date.getDay();
+      b.disabled = dow === 0 || dow === 6 || date < today;
+      b.setAttribute('aria-pressed', selDate && date.getTime() === selDate.getTime() ? 'true' : 'false');
+      b.setAttribute('aria-label', DAYS[dow] + ', ' + MONTHS[date.getMonth()] + ' ' + date.getDate());
+      if (date.getTime() === today.getTime()) b.classList.add('today');
+      b.addEventListener('click', function () {
+        selDate = (selDate && date.getTime() === selDate.getTime()) ? null : date;
+        render(); update();
+      });
+      return b;
+    }
+
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var wasOn = chip.getAttribute('aria-pressed') === 'true';
+        chips.forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
+        selWin = wasOn ? null : chip.dataset.win;
+        if (!wasOn) chip.setAttribute('aria-pressed', 'true');
+        update();
+      });
+    });
+
+    function fmt(d) {
+      return DAYS[d.getDay()] + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate();
+    }
+
+    function update() {
+      if (!selDate && !selWin) {
+        btn.href = 'mailto:' + MAIL + '?subject=' + encodeURIComponent('Book a time');
+        hint.textContent = 'Pick a day and a window — or email cold, that works too.';
+        state.textContent = 'No day picked';
+        return;
+      }
+      var parts = [];
+      if (selDate) parts.push(fmt(selDate));
+      if (selWin) parts.push(selWin.toLowerCase());
+      var subject = 'Book a time — ' + parts.join(', ');
+      var bodyText = 'Hi Matt,\n\nI’d like to grab 30 minutes' +
+        (selDate ? ' on ' + fmt(selDate) : '') +
+        (selWin ? ' in the ' + selWin.toLowerCase() : '') +
+        ' (Central Time). Here’s what I’d like to talk about:\n\n';
+      btn.href = 'mailto:' + MAIL + '?subject=' + encodeURIComponent(subject) +
+        '&body=' + encodeURIComponent(bodyText);
+      hint.textContent = (selDate && selWin)
+        ? 'On the card: ' + fmt(selDate) + ', ' + selWin.toLowerCase() + ' (CT).'
+        : (selDate ? fmt(selDate) + ' — now pick a window.' : selWin + ' — now pick a day.');
+      state.textContent = selDate
+        ? MONTHS[selDate.getMonth()].slice(0, 3) + ' ' + selDate.getDate() + (selWin ? ' · ' + selWin : '')
+        : selWin || 'No day picked';
+    }
+
+    render(); update();
+  })();
+</script>
+
+</body>
+</html>
