@@ -1,7 +1,9 @@
 # App Logo — matt-jones.org (Progressier PWA)
 
 App icon for the Progressier-built app of [matt-jones.org](https://www.matt-jones.org),
-derived from the site's baseball wordmark and palette ("A Website about Nothing").
+derived from the site's baseball wordmark and palette ("A Website about Nothing"):
+a full-bleed stitch-red field with the cream ball knocked out of it and the
+MJ monogram in scoreboard capitals.
 
 ![App logo](app-logo-512.png)
 
@@ -25,18 +27,17 @@ derived from the site's baseball wordmark and palette ("A Website about Nothing"
 3. If prompted separately for a **maskable** icon, upload
    `app-logo-maskable-512.png`.
 4. Suggested theme/background colors for the manifest:
-   - `theme_color`: `#F2F4EC` (paper)
-   - `background_color`: `#F2F4EC` (paper)
+   - `theme_color`: `#CC3B2E` (stitch red)
+   - `background_color`: `#CC3B2E` (stitch red — matches the icon field for a seamless splash screen)
 
 ## Brand palette (from the site)
 
 | Token | Hex | Role |
 |-------|-----|------|
-| Paper | `#F2F4EC` | Icon background |
-| Card | `#FBFCF7` | Ball |
-| Stitch | `#CC3B2E` | Outline, seams, lacing |
-| Ink | `#171A12` | MJ monogram |
-| Grass | `#2F6B45` | Reserved accent (unused in the icon) |
+| Stitch | `#CC3B2E` | Icon field, seams, lacing, MJ monogram |
+| Paper | `#F2F4EC` | Ball |
+| Ink | `#171A12` | Reserved (unused in the icon) |
+| Grass | `#2F6B45` | Reserved (unused in the icon) |
 
 Monogram set in **Big Shoulders Bold** (OFL) — a condensed scoreboard-style
 display face matching the site's heavy uppercase headers.
