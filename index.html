@@ -271,39 +271,67 @@
   /* ---- Subpage adjustments ---- */
   .hero h1.name { font-size: clamp(2.6rem, 10vw, 6.5rem); }
 
-  /* ---- Week scorecard ---- */
-  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  .sched-scroll { overflow-x: auto; }
-  table.sched { border-collapse: collapse; width: 100%; min-width: 560px; }
-  table.sched thead th {
-    font-family: var(--f-mono); font-size: .7rem; letter-spacing: .18em;
-    text-transform: uppercase; color: var(--muted); font-weight: 400;
-    padding: 14px 10px 12px; border-bottom: 2px dashed var(--stitch);
+  /* ---- Interactive calendar ---- */
+  .cal-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 16px; border-bottom: 2px dashed var(--stitch);
   }
-  table.sched tbody th {
-    text-align: left; padding: 0 18px; white-space: nowrap;
-    font-family: var(--f-display); font-weight: 700; text-transform: uppercase;
-    letter-spacing: .01em; font-size: 1rem; color: var(--ink);
-    border-bottom: 1px solid var(--line);
+  .cal-nav { display: flex; gap: 8px; }
+  .cal-nav button {
+    font-family: var(--f-mono); font-size: 1rem; line-height: 1;
+    background: transparent; border: 1px solid var(--line); border-radius: 4px;
+    padding: 8px 14px; color: var(--ink); cursor: pointer;
+    transition: color .12s, border-color .12s;
   }
-  table.sched tbody th small {
-    display: block; font-family: var(--f-mono); font-weight: 400;
-    font-size: .64rem; letter-spacing: .12em; color: var(--muted); margin-top: 2px;
+  .cal-nav button:hover:not(:disabled) { border-color: var(--stitch); color: var(--stitch); }
+  .cal-nav button:disabled { opacity: .35; cursor: default; }
+  .cal-label {
+    font-family: var(--f-mono); font-size: .8rem; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--ink); font-weight: 700;
   }
-  table.sched td { border: 1px solid var(--line); border-right: 0; padding: 0; }
-  table.sched tr td:last-child { border-right: 0; }
-  table.sched tbody tr:last-child th { border-bottom: 0; }
-  table.sched tbody tr:last-child td { border-bottom: 0; }
-  button.slot {
-    display: block; width: 100%; height: 58px;
-    background: transparent; border: 0; cursor: pointer;
-    font-family: var(--f-mono); font-size: .66rem; letter-spacing: .16em;
+  .cal-state {
+    font-family: var(--f-mono); font-size: .7rem; letter-spacing: .12em;
     text-transform: uppercase; color: var(--muted);
-    transition: background .12s, color .12s;
   }
-  button.slot:hover { background: color-mix(in srgb, var(--grass) 12%, transparent); color: var(--ink); }
-  button.slot[aria-pressed="true"] { background: var(--grass); color: #fff; font-weight: 700; }
-  button.slot[aria-pressed="true"]::before { content: "⚾ "; }
+  @media (max-width: 560px){ .cal-state { display: none; } }
+  table.cal-grid { width: 100%; border-collapse: collapse; }
+  .cal-grid th {
+    font-family: var(--f-mono); font-size: .64rem; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--muted); font-weight: 400;
+    padding: 12px 0 10px; border-bottom: 1px solid var(--line);
+  }
+  .cal-grid td { border: 1px solid var(--line); padding: 0; height: 54px; width: 14.28%; }
+  .cal-grid td.blank { background: color-mix(in srgb, var(--line) 16%, transparent); }
+  button.day {
+    display: block; width: 100%; height: 100%;
+    background: transparent; border: 0; cursor: pointer;
+    font-family: var(--f-mono); font-variant-numeric: tabular-nums;
+    font-size: .92rem; color: var(--ink); transition: background .12s;
+  }
+  button.day:hover:not(:disabled) { background: color-mix(in srgb, var(--grass) 12%, transparent); }
+  button.day:disabled { color: color-mix(in srgb, var(--muted) 40%, transparent); cursor: default; }
+  button.day[aria-pressed="true"] { background: var(--grass); color: #fff; font-weight: 700; }
+  button.day.today:not([aria-pressed="true"])::after {
+    content: ""; display: block; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--stitch); margin: 3px auto 0;
+  }
+  .win-row {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 16px 20px; border-top: 1px solid var(--line);
+  }
+  .win-label {
+    font-family: var(--f-mono); font-size: .68rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--muted); margin-right: 4px;
+  }
+  .chip {
+    font-family: var(--f-mono); font-size: .74rem; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--ink);
+    background: transparent; border: 1px solid var(--line); border-radius: 999px;
+    padding: 9px 16px; cursor: pointer;
+    transition: background .14s, border-color .14s, color .14s;
+  }
+  .chip:hover { border-color: var(--grass); }
+  .chip[aria-pressed="true"] { background: var(--grass); border-color: var(--grass); color: #fff; }
   .book-row {
     display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
     padding: 20px; border-top: 2px dashed var(--stitch);
@@ -351,7 +379,7 @@
       <p class="eyebrow reveal">First pitch &nbsp;·&nbsp; your call</p>
       <h1 class="name reveal">Book a Time</h1>
       <p class="tagline reveal">Nine innings or a quick catch — your pick.</p>
-      <p class="lede reveal">Tap a slot on the week's scorecard and the email writes itself — day, window, and room to say what you want to talk about. All times Central.</p>
+      <p class="lede reveal">Pick a day on the calendar, choose a window, and the email writes itself — date, time, and room to say what you want to talk about. All times Central.</p>
     </div>
   </section>
 
@@ -359,47 +387,33 @@
 
   <section id="schedule">
     <div class="wrap">
-      <div class="sec-head reveal"><span class="sec-kicker">This week's scorecard</span></div>
-      <h2 class="sec-title reveal">Pick Your Slot</h2>
-      <p class="sec-sub reveal">One tap picks the day and the window — green means you're on the card.</p>
+      <div class="sec-head reveal"><span class="sec-kicker">The schedule</span></div>
+      <h2 class="sec-title reveal">Pick Your Day</h2>
+      <p class="sec-sub reveal">Weekdays only — the weekend is for baseball. Green means you're on the card.</p>
       <div class="card reveal">
-        <div class="card-top"><span>Window · Monday–Friday · CT</span><span class="mono" id="sched-state">No slot picked</span></div>
-        <div class="sched-scroll">
-          <table class="sched tnum" aria-label="Weekly availability — pick one slot">
-            <thead>
-              <tr><th scope="col"><span class="visually-hidden">Window</span></th><th scope="col">Mon</th><th scope="col">Tue</th><th scope="col">Wed</th><th scope="col">Thu</th><th scope="col">Fri</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">Morning <small>9a – 12p</small></th>
-                <td><button class="slot" type="button" data-day="Monday" data-win="Morning" aria-pressed="false">Open</button></td>
-                <td><button class="slot" type="button" data-day="Tuesday" data-win="Morning" aria-pressed="false">Open</button></td>
-                <td><button class="slot" type="button" data-day="Wednesday" data-win="Morning" aria-pressed="false">Open</button></td>
-                <td><button class="slot" type="button" data-day="Thursday" data-win="Morning" aria-pressed="false">Open</button></td>
-                <td><button class="slot" type="button" data-day="Friday" data-win="Morning" aria-pressed="false">Open</button></td>
-              </tr>
-              <tr>
-                <th scope="row">Afternoon <small>12p – 5p</small></th>
-                <td><button class="slot" type="button" data-day="Monday" data-win="Afternoon" aria-pressed="false">Open</button></td>
-                <td><button class="slot" type="button" data-day="Tuesday" data-win="Afternoon" aria-pressed="false">Open</button></td>
-                <td><button class="slot" type="button" data-day="Wednesday" data-win="Afternoon" aria-pressed="false">Open</button></td>
-                <td><button class="slot" type="button" data-day="Thursday" data-win="Afternoon" aria-pressed="false">Open</button></td>
-                <td><button class="slot" type="button" data-day="Friday" data-win="Afternoon" aria-pressed="false">Open</button></td>
-              </tr>
-              <tr>
-                <th scope="row">Evening <small>5p – 8p</small></th>
-                <td><button class="slot" type="button" data-day="Monday" data-win="Evening" aria-pressed="false">Open</button></td>
-                <td><button class="slot" type="button" data-day="Tuesday" data-win="Evening" aria-pressed="false">Open</button></td>
-                <td><button class="slot" type="button" data-day="Wednesday" data-win="Evening" aria-pressed="false">Open</button></td>
-                <td><button class="slot" type="button" data-day="Thursday" data-win="Evening" aria-pressed="false">Open</button></td>
-                <td><button class="slot" type="button" data-day="Friday" data-win="Evening" aria-pressed="false">Open</button></td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="cal-head">
+          <div class="cal-nav">
+            <button type="button" id="cal-prev" aria-label="Previous month">‹</button>
+            <button type="button" id="cal-next" aria-label="Next month">›</button>
+          </div>
+          <span class="cal-label" id="cal-label">—</span>
+          <span class="cal-state mono" id="cal-state">No day picked</span>
+        </div>
+        <table class="cal-grid tnum" aria-label="Calendar — pick a weekday">
+          <thead>
+            <tr><th scope="col">Sun</th><th scope="col">Mon</th><th scope="col">Tue</th><th scope="col">Wed</th><th scope="col">Thu</th><th scope="col">Fri</th><th scope="col">Sat</th></tr>
+          </thead>
+          <tbody id="cal-body"></tbody>
+        </table>
+        <div class="win-row" role="group" aria-label="Choose a window">
+          <span class="win-label">Window</span>
+          <button class="chip" type="button" data-win="Morning" aria-pressed="false">Morning · 9a–12p</button>
+          <button class="chip" type="button" data-win="Afternoon" aria-pressed="false">Afternoon · 12p–5p</button>
+          <button class="chip" type="button" data-win="Evening" aria-pressed="false">Evening · 5p–8p</button>
         </div>
         <div class="book-row">
           <a class="btn primary" id="book-btn" href="mailto:mscottjones24@gmail.com?subject=Book%20a%20time">Email to book <span aria-hidden="true">→</span></a>
-          <span class="book-hint" id="book-hint">Pick a slot above — or email cold, that works too.</span>
+          <span class="book-hint" id="book-hint">Pick a day and a window — or email cold, that works too.</span>
         </div>
       </div>
 
@@ -417,7 +431,7 @@
         <a class="snap reveal" href="mailto:mscottjones24@gmail.com">
           <span class="tag">The backup</span>
           <h3>Just email</h3>
-          <p>Scorecards optional. A plain note to the inbox gets the same answer.</p>
+          <p>Calendars optional. A plain note to the inbox gets the same answer.</p>
           <span class="more">mscottjones24@gmail.com →</span>
         </a>
       </div>
@@ -461,37 +475,107 @@
 
 <script>
   (function () {
-    var slots = Array.prototype.slice.call(document.querySelectorAll('.slot'));
+    var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    var MAIL = 'mscottjones24@gmail.com';
+
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var view = new Date(today.getFullYear(), today.getMonth(), 1);
+    var minView = new Date(view);
+    var maxView = new Date(today.getFullYear(), today.getMonth() + 2, 1);
+    var selDate = null, selWin = null;
+
+    var body = document.getElementById('cal-body');
+    var label = document.getElementById('cal-label');
+    var state = document.getElementById('cal-state');
+    var prev = document.getElementById('cal-prev');
+    var next = document.getElementById('cal-next');
     var btn = document.getElementById('book-btn');
     var hint = document.getElementById('book-hint');
-    var state = document.getElementById('sched-state');
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
 
-    slots.forEach(function (slot) {
-      slot.addEventListener('click', function () {
-        var wasOn = slot.getAttribute('aria-pressed') === 'true';
-        slots.forEach(function (s) { s.setAttribute('aria-pressed', 'false'); s.textContent = 'Open'; });
-        if (wasOn) { update(null); return; }
-        slot.setAttribute('aria-pressed', 'true');
-        slot.textContent = 'Booked';
-        update({ day: slot.dataset.day, win: slot.dataset.win });
+    function render() {
+      label.textContent = MONTHS[view.getMonth()] + ' ' + view.getFullYear();
+      prev.disabled = view <= minView;
+      next.disabled = view >= maxView;
+      body.innerHTML = '';
+      var first = new Date(view.getFullYear(), view.getMonth(), 1).getDay();
+      var count = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+      var row = document.createElement('tr');
+      for (var i = 0; i < first; i++) row.appendChild(blank());
+      for (var d = 1; d <= count; d++) {
+        var date = new Date(view.getFullYear(), view.getMonth(), d);
+        var td = document.createElement('td');
+        td.appendChild(dayButton(date));
+        row.appendChild(td);
+        if (date.getDay() === 6) { body.appendChild(row); row = document.createElement('tr'); }
+      }
+      while (row.children.length && row.children.length < 7) row.appendChild(blank());
+      if (row.children.length) body.appendChild(row);
+    }
+
+    function blank() {
+      var td = document.createElement('td');
+      td.className = 'blank';
+      return td;
+    }
+
+    function dayButton(date) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'day';
+      b.textContent = date.getDate();
+      var dow = date.getDay();
+      b.disabled = dow === 0 || dow === 6 || date < today;
+      b.setAttribute('aria-pressed', selDate && date.getTime() === selDate.getTime() ? 'true' : 'false');
+      b.setAttribute('aria-label', DAYS[dow] + ', ' + MONTHS[date.getMonth()] + ' ' + date.getDate());
+      if (date.getTime() === today.getTime()) b.classList.add('today');
+      b.addEventListener('click', function () {
+        selDate = (selDate && date.getTime() === selDate.getTime()) ? null : date;
+        render(); update();
+      });
+      return b;
+    }
+
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var wasOn = chip.getAttribute('aria-pressed') === 'true';
+        chips.forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
+        selWin = wasOn ? null : chip.dataset.win;
+        if (!wasOn) chip.setAttribute('aria-pressed', 'true');
+        update();
       });
     });
 
-    function update(picked) {
-      if (!picked) {
-        btn.href = 'mailto:mscottjones24@gmail.com?subject=' + encodeURIComponent('Book a time');
-        hint.textContent = 'Pick a slot above — or email cold, that works too.';
-        state.textContent = 'No slot picked';
+    function fmt(d) {
+      return DAYS[d.getDay()] + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate();
+    }
+
+    function update() {
+      if (!selDate && !selWin) {
+        btn.href = 'mailto:' + MAIL + '?subject=' + encodeURIComponent('Book a time');
+        hint.textContent = 'Pick a day and a window — or email cold, that works too.';
+        state.textContent = 'No day picked';
         return;
       }
-      var subject = 'Book a time — ' + picked.day + ' ' + picked.win.toLowerCase();
-      var body = 'Hi Matt,\n\nI’d like to grab 30 minutes on ' + picked.day + ' in the ' +
-        picked.win.toLowerCase() + ' (Central Time). Here’s what I’d like to talk about:\n\n';
-      btn.href = 'mailto:mscottjones24@gmail.com?subject=' + encodeURIComponent(subject) +
-        '&body=' + encodeURIComponent(body);
-      hint.textContent = 'On the card: ' + picked.day + ', ' + picked.win.toLowerCase() + ' (CT).';
-      state.textContent = picked.day.slice(0, 3) + ' · ' + picked.win;
+      var parts = [];
+      if (selDate) parts.push(fmt(selDate));
+      if (selWin) parts.push(selWin.toLowerCase());
+      var subject = 'Book a time — ' + parts.join(', ');
+      var bodyText = 'Hi Matt,\n\nI’d like to grab 30 minutes' +
+        (selDate ? ' on ' + fmt(selDate) : '') +
+        (selWin ? ' in the ' + selWin.toLowerCase() : '') +
+        ' (Central Time). Here’s what I’d like to talk about:\n\n';
+      btn.href = 'mailto:' + MAIL + '?subject=' + encodeURIComponent(subject) +
+        '&body=' + encodeURIComponent(bodyText);
+      hint.textContent = (selDate && selWin)
+        ? 'On the card: ' + fmt(selDate) + ', ' + selWin.toLowerCase() + ' (CT).'
+        : (selDate ? fmt(selDate) + ' — now pick a window.' : selWin + ' — now pick a day.');
+      state.textContent = selDate
+        ? MONTHS[selDate.getMonth()].slice(0, 3) + ' ' + selDate.getDate() + (selWin ? ' · ' + selWin : '')
+        : selWin || 'No day picked';
     }
+
+    render(); update();
   })();
 </script>
 
