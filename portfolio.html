@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Matt Jones — Portfolio</title>
+<style>
+  /* ============================================================
+     matt-jones.org — Portfolio PDF
+     Design system lifted verbatim from the live site so the
+     document reads as an extension of the ballpark, not a export.
+     ============================================================ */
+  :root {
+    --paper:  #F2F4EC;
+    --card:   #FBFCF7;
+    --ink:    #171A12;
+    --muted:  #5B6152;
+    --line:   #C9CFBE;
+    --stitch: #CC3B2E;   /* baseball lacing red */
+    --grass:  #2F6B45;   /* outfield green */
+    --shadow: 0 1px 0 rgba(23,26,18,.04), 0 12px 30px -18px rgba(23,26,18,.35);
+    --f-display: "Arial Narrow", "Helvetica Neue", "Liberation Sans", Arial, sans-serif;
+    --f-body: "Liberation Sans", ui-sans-serif, system-ui, -apple-system, Helvetica, Arial, sans-serif;
+    --f-mono: "DejaVu Sans Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  @page { size: Letter; margin: 0; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--f-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    position: relative;
+    width: 8.5in;
+    min-height: 11in;
+    padding: 0.72in 0.78in 0.68in;
+    background: var(--paper);
+    page-break-after: always;
+    overflow: hidden;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  .mono { font-family: var(--f-mono); }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  /* ---- Signature stitch (baseball lacing) ---- */
+  .stitch { height: 0; border-top: 2px dashed var(--stitch); opacity: .85; }
+
+  /* ---- Baseball wordmark ---- */
+  .wordmark {
+    font-family: var(--f-display);
+    font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
+    font-size: .82rem;
+    display: inline-flex; align-items: center; gap: .6em; color: var(--ink);
+  }
+  .ball {
+    width: 15px; height: 15px; border-radius: 50%;
+    background: var(--card); border: 1.5px solid var(--stitch);
+    position: relative; display: inline-block; flex: none;
+  }
+  .ball::before, .ball::after {
+    content:""; position:absolute; inset:2px 4px;
+    border:1px solid var(--stitch); border-top:0; border-bottom:0; border-radius:50%;
+  }
+
+  .eyebrow {
+    font-family: var(--f-mono); font-size: .72rem; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--grass); margin: 0;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .eyebrow::after { content:""; flex:1; height:1px; background: var(--line); }
+
+  h1.name {
+    font-family: var(--f-display); font-weight: 800; text-transform: uppercase;
+    letter-spacing: -.01em; line-height: .88; margin: 0;
+    font-size: 6.6rem; text-wrap: balance;
+  }
+  .tagline {
+    margin: 14px 0 0; font-family: var(--f-display);
+    font-weight: 700; font-style: italic; font-size: 1.7rem;
+    color: var(--stitch); letter-spacing: -.01em;
+  }
+  .lede { max-width: 48ch; margin: 20px 0 0; font-size: 1.02rem; color: var(--muted); }
+
+  /* ---- Section headings ---- */
+  .sec-kicker {
+    font-family: var(--f-mono); font-size: .7rem; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  h2.sec-title {
+    font-family: var(--f-display); font-weight: 800; text-transform: uppercase;
+    letter-spacing: -.01em; line-height: 1; margin: 6px 0 0; font-size: 2.5rem;
+  }
+  .sec-sub { color: var(--muted); margin: 12px 0 0; max-width: 62ch; font-size: .98rem; }
+  p.body { max-width: 66ch; font-size: .98rem; }
+  p.body + p.body { margin-top: 12px; }
+
+  /* ---- Snapshot / feature cards ---- */
+  .snaps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 26px; }
+  .snap {
+    background: var(--card); border: 1px solid var(--line); border-radius: 6px;
+    padding: 18px 20px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .snap .tag {
+    font-family: var(--f-mono); font-size: .64rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--grass);
+  }
+  .snap h3 {
+    margin: 0; font-family: var(--f-display); font-weight: 700;
+    text-transform: uppercase; font-size: 1.12rem; letter-spacing: -.005em;
+  }
+  .snap p { margin: 0; color: var(--muted); font-size: .9rem; }
+
+  /* ---- Lineup card (scorecard) ---- */
+  .card {
+    margin-top: 24px; background: var(--card);
+    border: 1px solid var(--line); border-radius: 6px;
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  .card-top {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 13px 20px; border-bottom: 2px dashed var(--stitch);
+    font-family: var(--f-mono); font-size: .68rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  ul.lineup { list-style: none; margin: 0; padding: 2px 0; }
+  ul.lineup li {
+    display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 16px;
+    padding: 14px 20px; border-bottom: 1px solid var(--line);
+  }
+  ul.lineup li:last-child { border-bottom: 0; }
+  .pos { font-family: var(--f-mono); font-weight: 700; font-size: 1.02rem; color: var(--stitch); text-align: center; }
+  .player-name {
+    font-family: var(--f-display); font-weight: 700; text-transform: uppercase;
+    letter-spacing: .01em; font-size: 1.16rem;
+  }
+  .player-desc { margin: 3px 0 0; color: var(--muted); font-size: .86rem; max-width: 60ch; }
+  .side {
+    font-family: var(--f-mono); font-size: .62rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px; white-space: nowrap; align-self: start;
+  }
+
+  /* ---- Spotlight blocks ---- */
+  .spot { margin-top: 22px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 6px; box-shadow: var(--shadow); overflow: hidden; }
+  .spot-head {
+    padding: 14px 22px; border-bottom: 2px dashed var(--stitch);
+    display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
+  }
+  .spot-head h3 { margin: 0; font-family: var(--f-display); font-weight: 800;
+    text-transform: uppercase; font-size: 1.3rem; letter-spacing: -.005em; }
+  .spot-head .role { font-family: var(--f-mono); font-size: .64rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--grass); }
+  .spot-body { padding: 18px 22px; }
+  .spot-body p { margin: 0; color: var(--muted); font-size: .92rem; }
+  .spot-body p + p { margin-top: 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+  .chip {
+    font-family: var(--f-mono); font-size: .64rem; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--ink);
+    border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px;
+  }
+
+  /* ---- Footer strip ---- */
+  .foot {
+    position: absolute; left: 0.78in; right: 0.78in; bottom: 0.5in;
+  }
+  .foot-grid { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
+  .foot-name { font-family: var(--f-display); font-weight: 800; text-transform: uppercase;
+    font-size: 1.5rem; letter-spacing: -.01em; line-height: 1; }
+  .foot-links { display: flex; flex-direction: column; gap: 5px; text-align: right; }
+  .foot-links a, .foot-links span {
+    font-family: var(--f-mono); font-size: .74rem; letter-spacing: .04em;
+    color: var(--muted); text-decoration: none;
+  }
+  .copyright { font-family: var(--f-mono); font-size: .66rem; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted); margin-top: 20px; }
+
+  .pageno { position: absolute; right: 0.78in; bottom: 0.34in;
+    font-family: var(--f-mono); font-size: .62rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--muted); }
+
+  .spacer-lg { height: 40px; }
+  .spacer-md { height: 26px; }
+</style>
+</head>
+<body>
+
+<!-- ============================== PAGE 1 — COVER ============================== -->
+<section class="page">
+  <div class="wordmark"><span class="ball" aria-hidden="true"></span> Matt Jones</div>
+
+  <div style="margin-top: 2.5in;">
+    <p class="eyebrow">The scouting report &nbsp;·&nbsp; 2026</p>
+    <h1 class="name" style="margin-top: 22px;">Matt<br>Jones</h1>
+    <p class="tagline">Software with a baseball soul.</p>
+    <p class="lede">A field guide to <strong>matt-jones.org</strong> — what the site is,
+      how it's built, and every project on the roster. One part portfolio, one
+      part scorecard.</p>
+  </div>
+
+  <div class="foot">
+    <div class="stitch" style="margin-bottom: 22px;"></div>
+    <div class="foot-grid">
+      <div class="foot-name">Play ball.</div>
+      <div class="foot-links">
+        <span>matt-jones.org</span>
+        <a href="mailto:mscottjones24@gmail.com">mscottjones24@gmail.com</a>
+        <a href="https://linkedin.com/in/mattjoneshtx">linkedin.com/in/mattjoneshtx</a>
+      </div>
+    </div>
+    <div class="copyright">© Matt Jones, 2026 — A website about nothing.</div>
+  </div>
+</section>
+
+<!-- ============================== PAGE 2 — ABOUT + FEATURES ============================== -->
+<section class="page">
+  <div class="wordmark"><span class="ball" aria-hidden="true"></span> Matt Jones</div>
+  <div class="stitch" style="margin: 14px 0 30px;"></div>
+
+  <p class="sec-kicker">The ballpark</p>
+  <h2 class="sec-title">About the site</h2>
+  <p class="body" style="margin-top:16px;">
+    <strong>matt-jones.org</strong> is a personal home base — a portfolio that wears its
+    obsessions on its sleeve. The whole site is built around a single running metaphor:
+    a baseball scorecard. Type is set in condensed, all-caps display faces; section labels
+    read like stat-sheet columns in monospace; and a dashed red rule — the stitch of a
+    baseball's lacing — is threaded through every divider, card, and menu.
+  </p>
+  <p class="body">
+    Underneath the theme it's a fast, hand-built static site: no framework, one clean
+    stylesheet, and a design language that holds together from the hero down to the
+    footer. It splits into two dugouts — <strong>Software</strong> and <strong>Baseball</strong> —
+    and invites you to book a time whenever you'd like to talk shop.
+  </p>
+
+  <div class="spacer-md"></div>
+  <p class="sec-kicker">What's on the field</p>
+  <h2 class="sec-title" style="font-size:1.7rem;">Features</h2>
+
+  <div class="snaps">
+    <div class="snap">
+      <span class="tag">Design language</span>
+      <h3>The scorecard look</h3>
+      <p>Baseball stitching, condensed caps, monospace stat-labels, and an outfield-green
+         and lacing-red palette carried across every page.</p>
+    </div>
+    <div class="snap">
+      <span class="tag">Light &amp; dark</span>
+      <h3>Day game or night game</h3>
+      <p>Colors respond automatically to the reader's system theme, with a hand-tuned
+         palette for both light "paper" and dark "under the lights" modes.</p>
+    </div>
+    <div class="snap">
+      <span class="tag">Booking</span>
+      <h3>Interactive calendar</h3>
+      <p>A weekday-only month grid: pick a day and a window and the booking email
+         writes itself — subject, date, and time all pre-filled.</p>
+    </div>
+    <div class="snap">
+      <span class="tag">Navigation</span>
+      <h3>Two dugouts</h3>
+      <p>A sticky top bar with Software and Baseball drop-downs, so the whole roster
+         is one hover away from anywhere on the site.</p>
+    </div>
+    <div class="snap">
+      <span class="tag">Craft</span>
+      <h3>Accessible &amp; responsive</h3>
+      <p>Focus rings, ARIA labelling, tabular numerals, and a layout that reflows
+         cleanly from a wide desktop down to a phone.</p>
+    </div>
+    <div class="snap">
+      <span class="tag">Motion</span>
+      <h3>Reveal on scroll</h3>
+      <p>Sections ease in as they enter the viewport — and quietly turn themselves off
+         for readers who prefer reduced motion.</p>
+    </div>
+  </div>
+
+  <div class="pageno">matt-jones.org · 02</div>
+</section>
+
+<!-- ============================== PAGE 3 — SOFTWARE ROSTER ============================== -->
+<section class="page">
+  <div class="wordmark"><span class="ball" aria-hidden="true"></span> Matt Jones</div>
+  <div class="stitch" style="margin: 14px 0 30px;"></div>
+
+  <p class="sec-kicker">Dugout one</p>
+  <h2 class="sec-title">The software roster</h2>
+  <p class="sec-sub">The building side of the house — experiments and tools, mostly at the
+    intersection of language models, monitoring, and things worth automating.</p>
+
+  <div class="card">
+    <div class="card-top"><span>Lineup — Software</span><span>Pos / Player / Side</span></div>
+    <ul class="lineup">
+      <li>
+        <span class="pos">1</span>
+        <div>
+          <div class="player-name">LLMAdness</div>
+          <p class="player-desc">Bracket-style face-offs for language models — pit answers head-to-head, March-Madness fashion, and let the better response advance.</p>
+        </div>
+        <span class="side">LLMs</span>
+      </li>
+      <li>
+        <span class="pos">2</span>
+        <div>
+          <div class="player-name">AICompared</div>
+          <p class="player-desc">Send one prompt to Claude, GPT, Gemini, Mistral, and Cohere at once and compare the answers side by side. Typed, key-safe provider config.</p>
+        </div>
+        <span class="side">LLMs</span>
+      </li>
+      <li>
+        <span class="pos">3</span>
+        <div>
+          <div class="player-name">Cry Wolf</div>
+          <p class="player-desc">An alerting study in the cost of false alarms — when a signal is worth waking up for, and when the wolf isn't really at the door.</p>
+        </div>
+        <span class="side">Monitoring</span>
+      </li>
+      <li>
+        <span class="pos">4</span>
+        <div>
+          <div class="player-name">The Bullzen</div>
+          <p class="player-desc">Calm in the bullpen — a focused workspace for keeping track of what's warming up next without the noise.</p>
+        </div>
+        <span class="side">Tooling</span>
+      </li>
+      <li>
+        <span class="pos">5</span>
+        <div>
+          <div class="player-name">Windhover</div>
+          <p class="player-desc">Named for the hovering kestrel — a watcher that holds steady over a system and waits for the moment that matters.</p>
+        </div>
+        <span class="side">Monitoring</span>
+      </li>
+    </ul>
+  </div>
+
+  <p class="sec-sub" style="margin-top:20px; font-size:.86rem;">
+    <span class="mono" style="color:var(--stitch);">&#9432;</span>
+    AICompared and the booking calendar are profiled on the next pages from their source.
+    The remaining line-ups mirror the site's Software menu.
+  </p>
+
+  <div class="pageno">matt-jones.org · 03</div>
+</section>
+
+<!-- ============================== PAGE 4 — BASEBALL ROSTER ============================== -->
+<section class="page">
+  <div class="wordmark"><span class="ball" aria-hidden="true"></span> Matt Jones</div>
+  <div class="stitch" style="margin: 14px 0 30px;"></div>
+
+  <p class="sec-kicker">Dugout two</p>
+  <h2 class="sec-title">The baseball roster</h2>
+  <p class="sec-sub">Where the theme becomes the subject — small tools and write-ups for
+    people who count outs and clinching scenarios for fun.</p>
+
+  <div class="card">
+    <div class="card-top"><span>Lineup — Baseball</span><span>Pos / Player / Side</span></div>
+    <ul class="lineup">
+      <li>
+        <span class="pos">1</span>
+        <div>
+          <div class="player-name">Magic Number</div>
+          <p class="player-desc">The number every fan counts down: the wins-plus-rival-losses a club needs to clinch. A live season tracker that does the math for you.</p>
+        </div>
+        <span class="side">Standings</span>
+      </li>
+      <li>
+        <span class="pos">2</span>
+        <div>
+          <div class="player-name">Black Ink</div>
+          <p class="player-desc">A nod to Bill James's Black Ink Test — how often a player led the league, and what all that bold type says about a career.</p>
+        </div>
+        <span class="side">Sabermetrics</span>
+      </li>
+      <li>
+        <span class="pos">3</span>
+        <div>
+          <div class="player-name">Scouting Report</div>
+          <p class="player-desc">The old-fashioned look — tools, grades, and notes on who's worth watching, written the way a scout keeps a book.</p>
+        </div>
+        <span class="side">Scouting</span>
+      </li>
+      <li>
+        <span class="pos">4</span>
+        <div>
+          <div class="player-name">Book a Time</div>
+          <p class="player-desc">The site's interactive scheduler — a weekday calendar that drafts your meeting request in one click. Profiled next.</p>
+        </div>
+        <span class="side">Live tool</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="pageno">matt-jones.org · 04</div>
+</section>
+
+<!-- ============================== PAGE 5 — SPOTLIGHTS ============================== -->
+<section class="page">
+  <div class="wordmark"><span class="ball" aria-hidden="true"></span> Matt Jones</div>
+  <div class="stitch" style="margin: 14px 0 30px;"></div>
+
+  <p class="sec-kicker">Up close</p>
+  <h2 class="sec-title">Feature spotlights</h2>
+  <p class="sec-sub">Two projects with published source, profiled in a little more detail.</p>
+
+  <div class="spot">
+    <div class="spot-head">
+      <h3>AICompared</h3>
+      <span class="role">Software · TypeScript</span>
+    </div>
+    <div class="spot-body">
+      <p>A tool for comparing responses across AI providers. One prompt fans out to every
+         model you've configured — <strong>Anthropic (Claude), OpenAI (GPT), Google (Gemini),
+         Mistral, and Cohere</strong> — so their answers can be read side by side.</p>
+      <p>The design leans on doing the unglamorous parts well: a single typed configuration
+         module loads each provider's key from the environment, treats blank values as
+         "not configured," and fails loudly with a helpful message the moment a key is
+         actually needed. Keys live in a git-ignored <span class="mono">.env</span>, never in
+         the code, and a <span class="mono">config:check</span> script prints exactly which
+         providers are ready to go. Bring only the keys you have; it skips the rest.</p>
+      <div class="chips">
+        <span class="chip">TypeScript</span>
+        <span class="chip">Node · ESM</span>
+        <span class="chip">5 providers</span>
+        <span class="chip">Key-safe config</span>
+        <span class="chip">dotenv</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="spot">
+    <div class="spot-head">
+      <h3>Book a Time</h3>
+      <span class="role">Baseball · Vanilla JS</span>
+    </div>
+    <div class="spot-body">
+      <p>The site's scheduling page, and a neat demonstration of the whole design language in
+         one interaction. A weekday-only month grid — "the weekend is for baseball" — lets you
+         pick a day and a time window (Morning, Afternoon, or Evening, all Central).</p>
+      <p>There's no backend and no third-party widget: a small hand-written script builds the
+         calendar, limits the view to the next couple of months, and composes a ready-to-send
+         <span class="mono">mailto:</span> link with the subject and body already filled in.
+         Cold email works too — calendars optional. It's accessible by keyboard, respects
+         reduced-motion, and looks right in both day and night themes.</p>
+      <div class="chips">
+        <span class="chip">Vanilla JS</span>
+        <span class="chip">No dependencies</span>
+        <span class="chip">Accessible</span>
+        <span class="chip">mailto flow</span>
+        <span class="chip">Light / dark</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pageno">matt-jones.org · 05</div>
+</section>
+
+<!-- ============================== PAGE 6 — SUMMARY / CLOSE ============================== -->
+<section class="page">
+  <div class="wordmark"><span class="ball" aria-hidden="true"></span> Matt Jones</div>
+  <div class="stitch" style="margin: 14px 0 30px;"></div>
+
+  <p class="sec-kicker">The box score</p>
+  <h2 class="sec-title">Summary of work</h2>
+  <p class="body" style="margin-top:16px;">
+    Across the roster, the through-line is a builder who likes small, sharp tools and cares
+    about how they feel to use. On the <strong>software</strong> side that shows up as work
+    around language models — comparing them (<em>AICompared</em>), bracketing them
+    (<em>LLMAdness</em>) — and around monitoring and the discipline of a good alert
+    (<em>Cry Wolf</em>, <em>Windhover</em>, <em>The Bullzen</em>).
+  </p>
+  <p class="body">
+    On the <strong>baseball</strong> side the same instinct points at the game itself:
+    tracking a pennant race (<em>Magic Number</em>), measuring greatness
+    (<em>Black Ink</em>), and keeping a scout's book (<em>Scouting Report</em>). Tying it
+    together is the site itself — a from-scratch static build with a coherent visual system,
+    real interactivity, accessibility baked in, and not a stray pixel out of place.
+  </p>
+
+  <div class="snaps" style="grid-template-columns: repeat(3,1fr);">
+    <div class="snap"><span class="tag">Focus</span><h3>LLMs &amp; tooling</h3><p>Comparing models, taming alerts, automating the tedious.</p></div>
+    <div class="snap"><span class="tag">Craft</span><h3>Design-led</h3><p>One system, carried end to end — type, color, motion, a11y.</p></div>
+    <div class="snap"><span class="tag">Off the clock</span><h3>Baseball</h3><p>Standings, sabermetrics, and scouting, built for fun.</p></div>
+  </div>
+
+  <div class="foot">
+    <div class="stitch" style="margin-bottom: 22px;"></div>
+    <div class="foot-grid">
+      <div>
+        <div class="foot-name">Let's talk ball.</div>
+        <p class="sec-sub" style="margin-top:10px; max-width:34ch;">Interested in what I'm building? Drop a line — I answer.</p>
+      </div>
+      <div class="foot-links">
+        <span>matt-jones.org</span>
+        <a href="mailto:mscottjones24@gmail.com">mscottjones24@gmail.com</a>
+        <a href="https://linkedin.com/in/mattjoneshtx">linkedin.com/in/mattjoneshtx</a>
+        <a href="https://www.matt-jones.org/calendar">Book a time →</a>
+      </div>
+    </div>
+    <div class="copyright">© Matt Jones, 2026 — A website about nothing.</div>
+  </div>
+
+  <div class="pageno">matt-jones.org · 06</div>
+</section>
+
+</body>
+</html>
