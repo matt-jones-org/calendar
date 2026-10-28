@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scouting Report | Matt Jones</title>
+<style>
+  :root{
+    --paper:#F2F4EC; --card:#FBFCF7; --ink:#171A12; --muted:#5B6152;
+    --line:#C9CFBE; --stitch:#CC3B2E; --grass:#2F6B45;
+    --shadow:0 1px 0 rgba(23,26,18,.04), 0 12px 30px -18px rgba(23,26,18,.35);
+    --maxw:1080px;
+    --f-display:"Helvetica Neue","Arial Narrow",Arial,sans-serif;
+    --f-body:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --f-mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#0D1310; --card:#141B14; --ink:#EDEFE6; --muted:#9AA394; --line:#2A3326; --stitch:#E4573F; --grass:#4E9E6A; --shadow:0 1px 0 rgba(0,0,0,.3), 0 18px 40px -22px rgba(0,0,0,.8); }
+  }
+  :root[data-theme="light"]{ --paper:#F2F4EC; --card:#FBFCF7; --ink:#171A12; --muted:#5B6152; --line:#C9CFBE; --stitch:#CC3B2E; --grass:#2F6B45; --shadow:0 1px 0 rgba(23,26,18,.04), 0 12px 30px -18px rgba(23,26,18,.35); }
+  :root[data-theme="dark"]{ --paper:#0D1310; --card:#141B14; --ink:#EDEFE6; --muted:#9AA394; --line:#2A3326; --stitch:#E4573F; --grass:#4E9E6A; --shadow:0 1px 0 rgba(0,0,0,.3), 0 18px 40px -22px rgba(0,0,0,.8); }
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+  a{color:inherit;}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--stitch);outline-offset:3px;border-radius:2px;}
+  .mono{font-family:var(--f-mono);}
+  .tnum{font-variant-numeric:tabular-nums;}
+  .stitch{height:0;border-top:2px dashed var(--stitch);opacity:.8;}
+
+  header.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:saturate(1.1) blur(8px);border-bottom:1px solid var(--line);}
+  .bar .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;}
+  .wordmark{font-family:var(--f-display);font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:.95rem;text-decoration:none;display:inline-flex;align-items:center;gap:.5em;}
+  .wordmark .ball{width:15px;height:15px;border-radius:50%;background:var(--card);border:1.5px solid var(--stitch);position:relative;display:inline-block;}
+  .wordmark .ball::before,.wordmark .ball::after{content:"";position:absolute;inset:2px 4px;border:1px solid var(--stitch);border-top:0;border-bottom:0;border-radius:50%;}
+  nav.top{display:flex;gap:22px;}
+  nav.top a{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding:6px 0;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
+  nav.top a:hover{color:var(--ink);border-color:var(--stitch);}
+  @media (max-width:620px){nav.top{display:none;}}
+  nav.top .menu{position:relative;display:flex;align-items:center;}
+  nav.top .menu > a .caret{font-size:.85em;color:var(--stitch);}
+  nav.top .menu-list{position:absolute;top:100%;left:50%;transform:translateX(-50%);min-width:200px;padding:6px 0;background:var(--card);border:1px solid var(--line);border-top:2px dashed var(--stitch);border-radius:0 0 6px 6px;box-shadow:var(--shadow);display:none;flex-direction:column;}
+  nav.top .menu:hover .menu-list,nav.top .menu:focus-within .menu-list{display:flex;}
+  nav.top .menu-list a{display:block;padding:10px 16px;border-bottom:0;white-space:nowrap;}
+  nav.top .menu-list a:hover{color:var(--ink);background:color-mix(in srgb,var(--grass) 9%,transparent);}
+
+  .hero{padding:clamp(52px,9vw,104px) 0 clamp(40px,6vw,64px);}
+  .hero h1.name{font-size:clamp(2.6rem,10vw,6.5rem);}
+  .eyebrow{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;color:var(--grass);margin:0 0 18px;display:flex;align-items:center;gap:12px;}
+  .eyebrow::after{content:"";flex:1;height:1px;background:var(--line);}
+  h1.name{font-family:var(--f-display);font-weight:800;text-transform:uppercase;letter-spacing:-.01em;line-height:.9;margin:0;font-size:clamp(3.4rem,15vw,9.2rem);text-wrap:balance;}
+  .tagline{margin:18px 0 0;font-family:var(--f-display);font-weight:700;font-style:italic;font-size:clamp(1.25rem,3.2vw,2rem);color:var(--stitch);letter-spacing:-.01em;}
+  .lede{max-width:48ch;margin:22px 0 0;font-size:1.075rem;color:var(--muted);}
+
+  section{padding:clamp(46px,7vw,82px) 0;}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:8px;}
+  .sec-kicker{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);}
+  h2.sec-title{font-family:var(--f-display);font-weight:800;text-transform:uppercase;letter-spacing:-.01em;line-height:1;margin:6px 0 0;font-size:clamp(1.9rem,5vw,3.1rem);text-wrap:balance;}
+  .sec-sub{color:var(--muted);margin:14px 0 0;max-width:60ch;}
+
+  .card{margin-top:30px;background:var(--card);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);overflow:hidden;}
+
+  .snaps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px;}
+  @media (max-width:760px){.snaps{grid-template-columns:1fr;}}
+  .snap{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:22px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;text-decoration:none;transition:transform .12s,border-color .15s;}
+  .snap:hover{transform:translateY(-3px);border-color:var(--stitch);}
+  .snap .tag{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--grass);}
+  .snap h3{margin:2px 0 0;font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:1.15rem;letter-spacing:-.005em;}
+  .snap p{margin:0;color:var(--muted);font-size:.95rem;}
+
+  footer{border-top:2px dashed var(--stitch);padding:48px 0 60px;margin-top:20px;}
+  .foot-grid{display:flex;justify-content:space-between;align-items:flex-end;gap:28px;flex-wrap:wrap;}
+  .foot-name{font-family:var(--f-display);font-weight:800;text-transform:uppercase;font-size:clamp(1.6rem,5vw,2.4rem);letter-spacing:-.01em;line-height:1;}
+  .foot-links{display:flex;flex-direction:column;gap:8px;}
+  .foot-links a{font-family:var(--f-mono);font-size:.82rem;letter-spacing:.04em;color:var(--muted);text-decoration:none;}
+  .foot-links a:hover{color:var(--stitch);}
+  .copyright{margin-top:26px;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease;}
+  .reveal.in{opacity:1;transform:none;}
+  @media (prefers-reduced-motion: reduce){.reveal{opacity:1;transform:none;transition:none;}.snap:hover{transform:none;}}
+
+  /* ---- Scouting report card ---- */
+  .sr-head{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:end;padding:22px 24px;border-bottom:2px dashed var(--stitch);}
+  .sr-name{font-family:var(--f-display);font-weight:800;text-transform:uppercase;font-size:1.9rem;line-height:1;letter-spacing:-.01em;}
+  .sr-meta{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:10px;}
+  .sr-ofp{text-align:right;white-space:nowrap;}
+  .sr-ofp .n{font-family:var(--f-display);font-weight:800;font-variant-numeric:tabular-nums;font-size:2.8rem;line-height:.85;color:var(--grass);}
+  .sr-ofp .l{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);}
+  .sr-tools{padding:8px 24px 14px;}
+  .tool{display:grid;grid-template-columns:96px 1fr 40px;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);}
+  .tool:last-child{border-bottom:0;}
+  .tool .tname{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+  .tool .bar{height:10px;background:color-mix(in srgb,var(--line) 45%,transparent);border-radius:999px;overflow:hidden;}
+  .tool .bar > span{display:block;height:100%;background:var(--grass);border-radius:999px;}
+  .tool .grade{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:700;text-align:right;color:var(--ink);}
+  .sr-notes{padding:20px 24px 24px;border-top:1px solid var(--line);}
+  .sr-notes h4{font-family:var(--f-mono);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;}
+  .sr-notes p{margin:0 0 14px;color:var(--ink);}
+  .sr-notes p:last-child{margin-bottom:0;}
+  .scale{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.06em;color:var(--muted);margin:14px 4px 0;}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="wordmark" href="https://www.matt-jones.org/"><span class="ball" aria-hidden="true"></span> Matt Jones</a>
+    <nav class="top" aria-label="Primary">
+      <a href="https://www.matt-jones.org/">Home</a>
+      <a href="https://www.matt-jones.org/about">About</a>
+      <a href="https://www.matt-jones.org/portfolio">Portfolio</a>
+      <div class="menu">
+        <a href="https://www.matt-jones.org/portfolio#software" aria-haspopup="true">Software <span class="caret" aria-hidden="true">▾</span></a>
+        <div class="menu-list">
+          <a href="https://www.matt-jones.org/portfolio#llmadness">LLMAdness</a>
+          <a href="https://www.matt-jones.org/portfolio#cry-wolf">Cry Wolf</a>
+          <a href="https://www.matt-jones.org/portfolio#the-bullzen">The Bullzen</a>
+          <a href="https://www.matt-jones.org/portfolio#windhover">Windhover</a>
+          <a href="https://www.matt-jones.org/box-score">Box Score</a>
+        </div>
+      </div>
+      <div class="menu">
+        <a href="https://www.matt-jones.org/portfolio#baseball" aria-haspopup="true">Baseball <span class="caret" aria-hidden="true">▾</span></a>
+        <div class="menu-list">
+          <a href="https://www.matt-jones.org/magic-number">Magic Number</a>
+          <a href="https://www.matt-jones.org/black-ink">Black Ink</a>
+          <a href="https://www.matt-jones.org/scouting-report">Scouting Report</a>
+        </div>
+      </div>
+      <a href="https://www.matt-jones.org/calendar">Book a time</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow reveal">The 20–80 scale</p>
+      <h1 class="name reveal">Scouting Report</h1>
+      <p class="tagline reveal">Five tools, one honest grade.</p>
+      <p class="lede reveal">Scouts grade every tool on a 20–80 scale, where 50 is big-league average and every ten points is a standard deviation. Below is a report in that language — a template you can drop any player into.</p>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="stitch" aria-hidden="true"></div></div>
+
+  <section id="report">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="sec-kicker">The card</span></div>
+      <h2 class="sec-title reveal">Tool Grades</h2>
+      <p class="sec-sub reveal">Present grades are what a player shows today; the OFP (Overall Future Potential) rolls the projected tools into a single number.</p>
+
+      <div class="card reveal">
+        <div class="sr-head">
+          <div>
+            <div class="sr-name">Sample Prospect</div>
+            <div class="sr-meta">SS · R/R · 6'1", 190 · Age 21 · Double-A</div>
+          </div>
+          <div class="sr-ofp">
+            <div class="n tnum">55</div>
+            <div class="l">OFP</div>
+          </div>
+        </div>
+        <div class="sr-tools">
+          <div class="tool"><span class="tname">Hit</span><span class="bar"><span style="width:58%"></span></span><span class="grade tnum">55</span></div>
+          <div class="tool"><span class="tname">Power</span><span class="bar"><span style="width:67%"></span></span><span class="grade tnum">60</span></div>
+          <div class="tool"><span class="tname">Run</span><span class="bar"><span style="width:42%"></span></span><span class="grade tnum">45</span></div>
+          <div class="tool"><span class="tname">Arm</span><span class="bar"><span style="width:67%"></span></span><span class="grade tnum">60</span></div>
+          <div class="tool"><span class="tname">Field</span><span class="bar"><span style="width:50%"></span></span><span class="grade tnum">50</span></div>
+        </div>
+        <div class="sr-notes">
+          <h4>Report</h4>
+          <p>Advanced feel to hit from the right side with a compact, repeatable stroke and the strength to punish mistakes to the pull side. Chase rate ticked down in the second half — the plate discipline is real, not a small-sample mirage.</p>
+          <p>Actions at short are steady rather than flashy; average range plays up on a plus, accurate arm. Fringe-average runner underway, but reads and first-step quickness keep him at the position long-term. Everyday shortstop with a chance for more if the power fully arrives.</p>
+        </div>
+      </div>
+      <p class="scale reveal">Scale — 20 well-below-average · 40 below · 50 average · 60 plus · 70 plus-plus · 80 elite.</p>
+
+      <div class="snaps">
+        <div class="snap reveal"><span class="tag">Why 20–80</span><h3>Bell curve</h3><p>Centered on 50 with 10-point steps mapping to standard deviations — a common language across every org.</p></div>
+        <div class="snap reveal"><span class="tag">Present vs future</span><h3>Two numbers</h3><p>What a player is now and what he projects to be. The gap is the bet a team is making.</p></div>
+        <div class="snap reveal"><span class="tag">The tools</span><h3>Hit · Power · Run · Arm · Field</h3><p>For pitchers, swap in the pitches and command. Same scale, different toolbox.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="stitch" aria-hidden="true" style="margin-bottom:34px;"></div>
+    <div class="foot-grid">
+      <div>
+        <div class="foot-name">Let's talk ball.</div>
+        <p class="sec-sub" style="margin-top:12px;">Interested in what I'm building here? Drop a line — I answer.</p>
+      </div>
+      <div class="foot-links">
+        <a href="mailto:mscottjones24@gmail.com">mscottjones24@gmail.com</a>
+        <a href="https://linkedin.com/in/mattjoneshtx">linkedin.com/in/mattjoneshtx</a>
+        <a href="https://www.matt-jones.org/calendar">Book a time →</a>
+      </div>
+    </div>
+    <div class="copyright">© Matt Jones, 2026 — A website about nothing.</div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { threshold: 0.12 });
+    els.forEach(function (e) { io.observe(e); });
+  })();
+</script>
+
+</body>
+</html>

@@ -171,6 +171,7 @@
   .btn.primary { background: var(--stitch); border-color: var(--stitch); color: #fff; }
   .btn.primary:hover { background: color-mix(in srgb, var(--stitch) 88%, #000); }
   .btn.ghost:hover { background: var(--ink); color: var(--paper); }
+  .btn.is-off { opacity: .4; pointer-events: none; }
 
   /* ---- Section shell ---- */
   section { padding: clamp(46px, 7vw, 82px) 0; }
@@ -358,14 +359,15 @@
           <a href="https://www.matt-jones.org/portfolio#cry-wolf">Cry Wolf</a>
           <a href="https://www.matt-jones.org/portfolio#the-bullzen">The Bullzen</a>
           <a href="https://www.matt-jones.org/portfolio#windhover">Windhover</a>
+          <a href="https://www.matt-jones.org/box-score">Box Score</a>
         </div>
       </div>
       <div class="menu">
         <a href="https://www.matt-jones.org/portfolio#baseball" aria-haspopup="true">Baseball <span class="caret" aria-hidden="true">▾</span></a>
         <div class="menu-list">
           <a href="https://www.matt-jones.org/magic-number">Magic Number</a>
-          <a href="https://www.matt-jones.org/portfolio#black-ink">Black Ink</a>
-          <a href="https://www.matt-jones.org/portfolio#scouting-report">Scouting Report</a>
+          <a href="https://www.matt-jones.org/black-ink">Black Ink</a>
+          <a href="https://www.matt-jones.org/scouting-report">Scouting Report</a>
         </div>
       </div>
       <a href="https://www.matt-jones.org/calendar">Book a time</a>
@@ -412,8 +414,9 @@
           <button class="chip" type="button" data-win="Evening" aria-pressed="false">Evening · 5p–8p</button>
         </div>
         <div class="book-row">
-          <a class="btn primary" id="book-btn" href="mailto:mscottjones24@gmail.com?subject=Book%20a%20time">Email to book <span aria-hidden="true">→</span></a>
-          <span class="book-hint" id="book-hint">Pick a day and a window — or email cold, that works too.</span>
+          <a class="btn primary is-off" id="gcal-btn" href="#" target="_blank" rel="noopener">Add to Google Calendar <span aria-hidden="true">→</span></a>
+          <a class="btn ghost" id="book-btn" href="mailto:mscottjones24@gmail.com?subject=Book%20a%20time">Email instead</a>
+          <span class="book-hint" id="book-hint">Pick a day and a window to drop a hold on the calendar — or email cold, that works too.</span>
         </div>
       </div>
 
@@ -478,6 +481,15 @@
     var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     var MAIL = 'mscottjones24@gmail.com';
+    // Google Calendar hookup: picking a day + window builds a pre-filled event
+    // that invites Matt's Google Calendar. No backend or API keys needed.
+    var ORGANIZER = 'matt@matt-jones.org';
+    var TZ = 'America/Chicago';
+    var WIN_TIMES = {
+      Morning:   { s: '090000', e: '120000' },
+      Afternoon: { s: '120000', e: '170000' },
+      Evening:   { s: '170000', e: '200000' }
+    };
 
     var today = new Date(); today.setHours(0, 0, 0, 0);
     var view = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -491,6 +503,7 @@
     var prev = document.getElementById('cal-prev');
     var next = document.getElementById('cal-next');
     var btn = document.getElementById('book-btn');
+    var gcalBtn = document.getElementById('gcal-btn');
     var hint = document.getElementById('book-hint');
     var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
 
@@ -550,10 +563,39 @@
       return DAYS[d.getDay()] + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate();
     }
 
+    function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+    // Build a Google Calendar "create event" link, pre-filled and inviting Matt.
+    // Requires both a day and a window; returns null otherwise.
+    function gcalHref() {
+      if (!selDate || !selWin) return null;
+      var ymd = selDate.getFullYear() + pad2(selDate.getMonth() + 1) + pad2(selDate.getDate());
+      var win = WIN_TIMES[selWin];
+      var dates = ymd + 'T' + win.s + '/' + ymd + 'T' + win.e;
+      var text = 'Meeting with Matt Jones';
+      var details = 'A 30-minute conversation (Central Time). Requested via matt-jones.org — ' +
+        'feel free to nudge the exact start time within this window. Looking forward to it.';
+      return 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+        '&text=' + encodeURIComponent(text) +
+        '&dates=' + encodeURIComponent(dates) +
+        '&ctz=' + encodeURIComponent(TZ) +
+        '&add=' + encodeURIComponent(ORGANIZER) +
+        '&details=' + encodeURIComponent(details);
+    }
+
     function update() {
+      var gcal = gcalHref();
+      if (gcal) {
+        gcalBtn.href = gcal;
+        gcalBtn.classList.remove('is-off');
+      } else {
+        gcalBtn.href = '#';
+        gcalBtn.classList.add('is-off');
+      }
+
       if (!selDate && !selWin) {
         btn.href = 'mailto:' + MAIL + '?subject=' + encodeURIComponent('Book a time');
-        hint.textContent = 'Pick a day and a window — or email cold, that works too.';
+        hint.textContent = 'Pick a day and a window to drop a hold on the calendar — or email cold, that works too.';
         state.textContent = 'No day picked';
         return;
       }
@@ -568,7 +610,7 @@
       btn.href = 'mailto:' + MAIL + '?subject=' + encodeURIComponent(subject) +
         '&body=' + encodeURIComponent(bodyText);
       hint.textContent = (selDate && selWin)
-        ? 'On the card: ' + fmt(selDate) + ', ' + selWin.toLowerCase() + ' (CT).'
+        ? 'On the card: ' + fmt(selDate) + ', ' + selWin.toLowerCase() + ' (CT). Add to Google Calendar to invite Matt.'
         : (selDate ? fmt(selDate) + ' — now pick a window.' : selWin + ' — now pick a day.');
       state.textContent = selDate
         ? MONTHS[selDate.getMonth()].slice(0, 3) + ' ' + selDate.getDate() + (selWin ? ' · ' + selWin : '')
