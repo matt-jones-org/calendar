@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Secrets & tokens — never commit these
+.env
+token.json
+*.pem
+
+# Logs & OS cruft
+*.log
+.DS_Store
