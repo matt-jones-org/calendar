@@ -340,6 +340,34 @@
     font-family: var(--f-mono); font-size: .72rem; letter-spacing: .08em;
     text-transform: uppercase; color: var(--muted);
   }
+
+  /* ---- Booking form fields (revealed only when live booking is available) ---- */
+  .field-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    padding: 16px 20px; border-top: 1px solid var(--line);
+  }
+  @media (max-width: 560px){ .field-row { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.span { grid-column: 1 / -1; }
+  .field label {
+    font-family: var(--f-mono); font-size: .66rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .field input, .field textarea {
+    font-family: var(--f-body); font-size: .95rem; color: var(--ink);
+    background: var(--paper); border: 1px solid var(--line); border-radius: 4px;
+    padding: 10px 12px; width: 100%; resize: vertical;
+  }
+  .field input:focus, .field textarea:focus {
+    outline: 2px solid var(--stitch); outline-offset: 1px; border-color: var(--stitch);
+  }
+  .book-result {
+    padding: 0 20px 18px; font-family: var(--f-mono); font-size: .8rem;
+    letter-spacing: .02em; line-height: 1.7; color: var(--ink);
+  }
+  .book-result a { color: var(--grass); font-weight: 700; }
+  .book-result.err { color: var(--stitch); }
+  [hidden] { display: none !important; }
 </style>
 </head>
 <body>
@@ -411,10 +439,25 @@
           <button class="chip" type="button" data-win="Afternoon" aria-pressed="false">Afternoon · 12p–5p</button>
           <button class="chip" type="button" data-win="Evening" aria-pressed="false">Evening · 5p–8p</button>
         </div>
+        <div class="field-row" id="field-row" hidden>
+          <div class="field">
+            <label for="f-name">Your name</label>
+            <input id="f-name" type="text" autocomplete="name" placeholder="Jane Fan">
+          </div>
+          <div class="field">
+            <label for="f-email">Email</label>
+            <input id="f-email" type="email" autocomplete="email" placeholder="you@example.com">
+          </div>
+          <div class="field span">
+            <label for="f-notes">What's it about? (optional)</label>
+            <textarea id="f-notes" rows="2" placeholder="A line on what you'd like to talk about."></textarea>
+          </div>
+        </div>
         <div class="book-row">
           <a class="btn primary" id="book-btn" href="mailto:mscottjones24@gmail.com?subject=Book%20a%20time">Email to book <span aria-hidden="true">→</span></a>
           <span class="book-hint" id="book-hint">Pick a day and a window — or email cold, that works too.</span>
         </div>
+        <div class="book-result" id="book-result" hidden></div>
       </div>
 
       <div class="snaps" style="margin-top:26px;">
@@ -493,6 +536,12 @@
     var btn = document.getElementById('book-btn');
     var hint = document.getElementById('book-hint');
     var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+    var fieldRow = document.getElementById('field-row');
+    var fName = document.getElementById('f-name');
+    var fEmail = document.getElementById('f-email');
+    var fNotes = document.getElementById('f-notes');
+    var result = document.getElementById('book-result');
+    var live = false; // flipped on when the backend reports it can book
 
     function render() {
       label.textContent = MONTHS[view.getMonth()] + ' ' + view.getFullYear();
@@ -573,6 +622,76 @@
       state.textContent = selDate
         ? MONTHS[selDate.getMonth()].slice(0, 3) + ' ' + selDate.getDate() + (selWin ? ' · ' + selWin : '')
         : selWin || 'No day picked';
+    }
+
+    function pad2(n) { return (n < 10 ? '0' : '') + n; }
+    function isoDate(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+
+    function setBtnLabel(text) { btn.innerHTML = text + ' <span aria-hidden="true">→</span>'; }
+
+    function showResult(msg, isErr) {
+      result.hidden = false;
+      result.className = 'book-result' + (isErr ? ' err' : '');
+      result.innerHTML = msg;
+    }
+
+    // In live mode, intercept the button and book via the API instead of mailto.
+    function bookLive(e) {
+      if (!live) return; // backend absent → let the mailto link do its thing
+      e.preventDefault();
+      var email = (fEmail.value || '').trim();
+      if (!selDate || !selWin) { hint.textContent = 'Pick a day and a window first.'; return; }
+      if (!email) { hint.textContent = 'Add your email so I can send the invite.'; fEmail.focus(); return; }
+
+      btn.setAttribute('aria-disabled', 'true');
+      setBtnLabel('Booking…');
+      fetch('/api/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: (fName.value || '').trim(),
+          email: email,
+          date: isoDate(selDate),
+          window: selWin,
+          notes: (fNotes.value || '').trim()
+        })
+      }).then(function (r) {
+        return r.json().then(function (d) { return { ok: r.ok, d: d }; });
+      }).then(function (res) {
+        btn.removeAttribute('aria-disabled');
+        if (!res.ok) throw new Error(res.d && res.d.error ? res.d.error : 'Booking failed.');
+        setBtnLabel('Booked');
+        var meet = res.d.meetLink
+          ? 'Meet link: <a href="' + res.d.meetLink + '" target="_blank" rel="noopener">' + res.d.meetLink + '</a>'
+          : (res.d.eventLink ? '<a href="' + res.d.eventLink + '" target="_blank" rel="noopener">View on calendar</a>' : '');
+        showResult('✅ On the card for ' + fmt(selDate) + ', ' + selWin.toLowerCase() +
+          ' (CT). Check your inbox for the invite.<br>' + meet, false);
+        hint.textContent = 'Booked — details below.';
+      }).catch(function (err) {
+        btn.removeAttribute('aria-disabled');
+        setBtnLabel('Book it');
+        showResult('Couldn’t book automatically (' + err.message + '). Use the email route instead — ' +
+          '<a href="mailto:' + MAIL + '">' + MAIL + '</a>.', true);
+      });
+    }
+
+    btn.addEventListener('click', bookLive);
+
+    // Progressive enhancement: turn on live booking only when the backend is
+    // up and authorized. On a plain static host this fetch just fails and the
+    // page keeps its mailto behaviour.
+    if (window.fetch) {
+      fetch('/api/health', { headers: { 'Accept': 'application/json' } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          if (d && d.authorized) {
+            live = true;
+            fieldRow.hidden = false;
+            setBtnLabel('Book it');
+            hint.textContent = 'Pick a day and a window, add your email, and I’ll send a Meet invite.';
+          }
+        })
+        .catch(function () { /* no backend — stay on the mailto flow */ });
     }
 
     render(); update();
